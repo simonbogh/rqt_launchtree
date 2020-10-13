@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import sys
 
 from roslaunch.xmlloader import XmlLoader, loader
@@ -36,7 +37,7 @@ class LaunchtreeLoader(XmlLoader):
 
 	def _rosparam_tag(self, tag, context, ros_config, verbose):
 		param_file = tag.attributes['file'].value \
-			if tag.attributes.has_key('file') else ''
+			if 'file' in tag.attributes else ''
 		if param_file != '': 
 			param_filename = self.resolve_args(param_file, context)
 			level_name = ros_config.push_level(param_filename, unique=True)
@@ -55,6 +56,6 @@ class LaunchtreeLoader(XmlLoader):
 		loader.load_sysargs_into_context(self.root_context, argv)
 
 		if len(launch.getElementsByTagName('master')) > 0:
-			print "WARNING: ignoring defunct <master /> tag"
+			print("WARNING: ignoring defunct <master /> tag")
 		self._recurse_load(ros_config, launch.childNodes, self.root_context, None, is_core, verbose)
 

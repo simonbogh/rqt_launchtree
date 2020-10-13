@@ -13,6 +13,6 @@ install(DIRECTORY resource
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-install(PROGRAMS scripts/rqt_launchtree
+catkin_install_python(PROGRAMS scripts/rqt_launchtree
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

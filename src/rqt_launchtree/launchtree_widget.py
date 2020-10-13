@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import map
+from builtins import range
 import os
 import re
 import yaml
@@ -24,8 +29,8 @@ class LaunchtreeEntryItem(QTreeWidgetItem):
 		super(LaunchtreeEntryItem, self).__init__(*args, **kw)
 		self.inconsistent = False
 	def __ge__(self, other):
-		own_type_idx = map(lambda t: isinstance(self.instance, t), self._type_order).index(True)
-		other_type_idx = map(lambda t: isinstance(other.instance, t), self._type_order).index(True)
+		own_type_idx = [isinstance(self.instance, t) for t in self._type_order].index(True)
+		other_type_idx = [isinstance(other.instance, t) for t in self._type_order].index(True)
 		if own_type_idx != other_type_idx:
 			return own_type_idx >= other_type_idx
 		return self.text(0) >= other.text(0)
@@ -140,7 +145,7 @@ class LaunchtreeWidget(QWidget):
 
 	def display_config_tree(self, config_tree):
 		items = list()
-		for key, instance in config_tree.items():
+		for key, instance in list(config_tree.items()):
 			if key == '_root': continue
 			i = LaunchtreeEntryItem()
 			i.instance = instance
@@ -184,9 +189,7 @@ class LaunchtreeWidget(QWidget):
 
 	def update_package_list(self):
 		self._package_list = sorted(
-			filter(lambda p: len(self._get_launch_files(self._rp.get_path(p)))>0,
-				self._rp_package_list
-			)
+			[p for p in self._rp_package_list if len(self._get_launch_files(self._rp.get_path(p)))>0]
 		)
 		self.package_select.clear()
 		self.package_select.addItems(self._package_list)
@@ -201,11 +204,11 @@ class LaunchtreeWidget(QWidget):
 
 	def _get_launch_files(self, path):
 		return sorted(
-			itertools.imap(lambda p: p.replace(path + '/', ''),
-				itertools.ifilter(self._is_launch_file,
+			map(lambda p: p.replace(path + '/', ''),
+				filter(self._is_launch_file,
 					itertools.chain.from_iterable(
-						itertools.imap(lambda f:
-							map(lambda n: os.path.join(f[0], n), f[2]),
+						map(lambda f:
+							[os.path.join(f[0], n) for n in f[2]],
 							os.walk(path)
 						)
 					)
@@ -224,7 +227,7 @@ class LaunchtreeWidget(QWidget):
 		if current is None:
 			return
 		data = current.instance
-		if isinstance(data, dict) and data.has_key('_root'):
+		if isinstance(data, dict) and '_root' in data:
 			data = data['_root']
 		if isinstance(data, roslaunch.core.Param):
 			self.properties_content.setCurrentIndex(1)
@@ -346,7 +349,7 @@ class LaunchtreeWidget(QWidget):
 				entry.setBackgroundColor(0, self._highlight_color if highlight else self._neutral_color)
 
 			if entry.childCount() > 0:
-				not_empty = any(map(filter_launch_entry, map(entry.child, range(entry.childCount()))))
+				not_empty = any(map(filter_launch_entry, list(map(entry.child, list(range(entry.childCount()))))))
 				show |= show_empty or not_empty
 				entry.setExpanded(not collapse and (expand or entry.isExpanded()))
 
