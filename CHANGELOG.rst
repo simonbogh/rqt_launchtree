@@ -2,6 +2,11 @@
 Changelog for package rqt_launchtree
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2020-10-13)
+------------------
+* Updated to Noetic and Python3
+* Contributors: Simon Bøgh
+
 0.2.0 (2016-12-11)
 ------------------
 * Merge branch '130s-impr/save_status' into kinetic
